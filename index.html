@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IBONARIUM · Перша виставка</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  html, body {
+    width:100%;
+    height:100%;
+    background:#000;
+    color:#00ff66;
+    font-family:"Courier New", monospace;
+    overflow-x:hidden;
+  }
+
+  canvas {
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    z-index:0;
+  }
+
+  .gallery {
+    position: relative;
+    z-index:2;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .item img, .item video {
+    width: 100%;
+    border: 2px solid #00ff66;
+    border-radius: 8px;
+    box-shadow: 0 0 20px #00ff66;
+    background: #111;
+  }
+
+  .description {
+    font-size: 14px;
+    color: #00ff66;
+    text-align: center;
+    max-width: 90%;
+  }
+
+  video {
+    display: block;
+  }
+
+  @media (max-width:600px){
+    .gallery {
+      padding: 10px;
+      gap: 25px;
+    }
+    .description {
+      font-size: 12px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+
+<div class="gallery" id="gallery">
+  <!-- Тут будуть медіа елементи -->
+</div>
+
+<script>
+  // ==== Зірки на фоні ====
+  const canvas = document.getElementById('stars');
+  const ctx = canvas.getContext('2d');
+  let w = canvas.width = window.innerWidth;
+  let h = canvas.height = window.innerHeight;
+
+  const stars = [];
+  const starCount = 200;
+
+  for(let i=0; i<starCount; i++){
+    stars.push({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      r: Math.random()*1.2,
+      d: Math.random()*0.5 + 0.1
+    });
+  }
+
+  function drawStars(){
+    ctx.clearRect(0,0,w,h);
+    ctx.fillStyle = "#fff";
+    ctx.beginPath();
+    stars.forEach(s=>{
+      ctx.moveTo(s.x, s.y);
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+    });
+    ctx.fill();
+    updateStars();
+    requestAnimationFrame(drawStars);
+  }
+
+  function updateStars(){
+    stars.forEach(s=>{
+      s.y += s.d;
+      if(s.y > h) s.y = 0;
+    });
+  }
+
+  window.addEventListener('resize', ()=>{
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  });
+
+  drawStars();
+
+  // ==== Галерея перша виставка ====
+  const gallery = document.getElementById('gallery');
+  const baseURL = 'https://raw.githubusercontent.com/ТВОЙ_ЮЗЕР/ТВОЙ_РЕПО/main/'; // заміни на свій GitHub
+
+  // 13 JPEG і 13 відео
+  const jpegFiles = [];
+  const videoFiles = [];
+  for(let i=1;i<=13;i++){
+    jpegFiles.push(i + '.jpg');
+    videoFiles.push(i + '.mp4');
+  }
+
+  // Перемішуємо через один: JPEG → відео → JPEG → відео...
+  for(let i=0;i<13;i++){
+    // JPEG
+    const imgItem = document.createElement('div');
+    imgItem.className = 'item';
+    const img = document.createElement('img');
+    img.src = baseURL + jpegFiles[i];
+    imgItem.appendChild(img);
+    const desc = document.createElement('div');
+    desc.className = 'description';
+    desc.textContent = `Опис зображення ${i+1}`;
+    imgItem.appendChild(desc);
+    gallery.appendChild(imgItem);
+
+    // відео
+    const vidItem = document.createElement('div');
+    vidItem.className = 'item';
+    const video = document.createElement('video');
+    video.src = baseURL + videoFiles[i];
+    video.controls = true;
+    video.loop = true;
+    video.muted = true;
+    video.autoplay = false;
+    vidItem.appendChild(video);
+    const vdesc = document.createElement('div');
+    vdesc.className = 'description';
+    vdesc.textContent = `Опис відео ${i+1}`;
+    vidItem.appendChild(vdesc);
+    gallery.appendChild(vidItem);
+  }
+</script>
+
+</body>
+</html>
