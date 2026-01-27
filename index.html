@@ -3,20 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>IBONARIUM · First Exhibition</title>
+  <title>ibonarium · перша виставка</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto+Mono:wght@300;400&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --bg: #0a0a0a;
-      --gold: #d4af37;
-      --gold-dim: rgba(212, 175, 55, 0.15);
-      --gold-glow: rgba(212, 175, 55, 0.4);
-      --text: #f5f0e0;
-      --transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+      --bg: #000;
+      --neon: #00f0ff;
+      --neon-dim: rgba(0, 240, 255, 0.15);
+      --neon-glow: rgba(0, 240, 255, 0.4);
+      --purple: #9d00ff;
+      --text: #e0f7ff;
+      --transition: all 1.2s cubic-bezier(0.23, 1, 0.32, 1);
     }
 
     * { margin:0; padding:0; box-sizing:border-box; }
@@ -24,7 +25,7 @@
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: 'Playfair Display', serif;
+      font-family: 'Roboto Mono', monospace;
       overflow-x: hidden;
       min-height: 100vh;
       position: relative;
@@ -40,7 +41,7 @@
     .gallery-wrapper {
       position: relative;
       z-index: 5;
-      padding: 8rem 4rem;
+      padding: 6rem 3rem;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -48,47 +49,48 @@
     }
 
     h1 {
-      font-family: 'Cinzel Decorative', cursive;
-      font-size: clamp(5rem, 15vw, 12rem);
-      color: var(--gold);
-      text-shadow: 0 0 100px var(--gold-glow);
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(3.2rem, 12vw, 8rem);
+      color: var(--neon);
+      text-shadow: 0 0 60px var(--neon-glow), 0 0 120px var(--neon-dim);
       margin-bottom: 1rem;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.25em;
+      text-transform: lowercase;
+      font-weight: 500;
     }
 
     .subtitle {
-      font-size: 1.6rem;
-      color: #b89c5e;
+      font-size: 1.3rem;
+      color: #6666ff;
       letter-spacing: 0.4em;
-      text-transform: uppercase;
-      margin-bottom: 6rem;
+      margin-bottom: 8rem;
+      opacity: 0.8;
     }
 
-    /* Плаваючі елементи без сітки */
     .floating-gallery {
       position: relative;
       width: 100%;
-      height: 180vh; /* високий контейнер для дрейфу */
-      perspective: 1200px;
+      height: 220vh; /* довгий космос для дрейфу */
+      perspective: 1400px;
     }
 
     .item {
       position: absolute;
-      width: clamp(240px, 28vw, 380px);
-      border-radius: 16px;
+      width: clamp(220px, 26vw, 360px);
+      border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 20px 80px rgba(0,0,0,0.7);
+      box-shadow: 0 10px 60px rgba(0,240,255,0.15);
       cursor: pointer;
       transition: var(--transition);
       transform-style: preserve-3d;
       border: none;
-      background: rgba(20,20,20,0.4);
-      backdrop-filter: blur(8px);
+      background: rgba(5,5,20,0.3);
+      backdrop-filter: blur(6px);
     }
 
     .item:hover {
-      transform: scale(1.08) translateZ(80px);
-      box-shadow: 0 40px 120px rgba(212,175,55,0.3);
+      transform: scale(1.12) translateZ(120px) rotateX(8deg);
+      box-shadow: 0 30px 100px var(--neon-glow);
     }
 
     .item img, .item video {
@@ -97,94 +99,97 @@
       display: block;
       object-fit: cover;
       aspect-ratio: 3/4;
+      filter: brightness(0.95) contrast(1.1);
     }
 
     .desc-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.85));
+      background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.8));
       display: flex;
       align-items: flex-end;
       justify-content: center;
-      padding: 2rem;
+      padding: 1.8rem;
       opacity: 0;
-      transition: opacity 0.6s ease;
-      pointer-events: none;
+      transition: opacity 0.8s ease;
     }
 
     .item:hover .desc-overlay { opacity: 1; }
 
     .desc-overlay span {
-      font-size: 1.3rem;
-      color: var(--gold);
-      text-shadow: 0 2px 10px black;
+      font-size: 1.4rem;
+      color: var(--neon);
+      text-shadow: 0 0 20px var(--neon);
     }
 
-    /* Модальне вікно */
+    /* Модальне вікно — космічне */
     .modal {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.95);
+      background: rgba(0,0,10,0.96);
       display: none;
       align-items: center;
       justify-content: center;
       z-index: 100;
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(15px);
     }
 
     .modal.show { display: flex; }
 
     .modal-content {
-      max-width: 90%;
-      max-height: 90vh;
+      max-width: 92%;
+      max-height: 92vh;
       position: relative;
-      border-radius: 20px;
+      border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 0 120px var(--gold-glow);
+      box-shadow: 0 0 140px var(--neon-glow);
+      border: 1px solid var(--neon-dim);
     }
 
     .modal-media {
       width: 100%;
-      max-height: 70vh;
+      max-height: 68vh;
       object-fit: contain;
     }
 
     .modal-desc {
       padding: 2rem;
-      background: rgba(0,0,0,0.7);
+      background: rgba(0,0,0,0.6);
       text-align: center;
-      font-size: 1.4rem;
+      font-size: 1.35rem;
       color: var(--text);
+      font-family: 'Roboto Mono', monospace;
     }
 
-    .modal-desc strong { color: var(--gold); }
+    .modal-desc strong { color: var(--neon); }
 
     .close-btn {
       position: absolute;
-      top: 1.5rem;
-      right: 2rem;
-      font-size: 3rem;
-      color: var(--gold);
+      top: 1.2rem;
+      right: 1.8rem;
+      font-size: 3.5rem;
+      color: var(--neon);
       cursor: pointer;
       background: none;
       border: none;
+      text-shadow: 0 0 20px var(--neon);
     }
 
     @media (max-width: 800px) {
-      .gallery-wrapper { padding: 6rem 2rem; }
-      h1 { font-size: clamp(4rem, 18vw, 8rem); }
-      .item { width: clamp(200px, 45vw, 320px); }
+      .gallery-wrapper { padding: 4rem 1.5rem; }
+      h1 { font-size: clamp(3rem, 18vw, 6rem); }
+      .item { width: clamp(180px, 42vw, 300px); }
     }
   </style>
 </head>
 <body>
 
 <canvas id="stars"></canvas>
-<canvas id="geometry"></canvas>
+<canvas id="nebula"></canvas>
 
 <div class="gallery-wrapper">
-  <h1>IBONARIUM</h1>
-  <div class="subtitle">Exclusive Floating Collection</div>
+  <h1>ibonarium</h1>
+  <div class="subtitle">floating in the void · 2025–2026</div>
 
   <div class="floating-gallery" id="gallery"></div>
 </div>
@@ -198,77 +203,76 @@
 </div>
 
 <script>
-// Зірки — золотаві, повільні
+// Зірки — повільні, глибокий космос
 const starsCanvas = document.getElementById('stars');
 const sctx = starsCanvas.getContext('2d');
 let w = starsCanvas.width = window.innerWidth;
 let h = starsCanvas.height = window.innerHeight;
 
 const stars = [];
-for(let i = 0; i < 140; i++){
+for(let i = 0; i < 300; i++){
   stars.push({
     x: Math.random()*w,
-    y: Math.random()*h*1.5,
-    r: Math.random()*1.6 + 0.6,
-    d: Math.random()*0.18 + 0.03,
-    hue: 35 + Math.random()*30
+    y: Math.random()*h*1.8,
+    r: Math.random()*1.8 + 0.3,
+    d: Math.random()*0.25 + 0.05,
+    opacity: Math.random()*0.7 + 0.3
   });
 }
 
 function drawStars(){
-  sctx.fillStyle = 'rgba(10,10,10,0.7)';
+  sctx.fillStyle = 'rgba(0,0,0,0.4)';
   sctx.fillRect(0,0,w,h);
   stars.forEach(s => {
-    sctx.fillStyle = `hsla(${s.hue}, 90%, 88%, 0.7)`;
+    sctx.fillStyle = `rgba(220,240,255,${s.opacity})`;
     sctx.beginPath();
     sctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
     sctx.fill();
     s.y += s.d;
-    if(s.y > h) s.y = -20;
+    if(s.y > h) s.y = -s.r*3;
   });
   requestAnimationFrame(drawStars);
 }
 drawStars();
 
-// Геометрія — золоті лінії
-const geoCanvas = document.getElementById('geometry');
-const gctx = geoCanvas.getContext('2d');
-const shapes = [];
-for(let i = 0; i < 8; i++){
-  shapes.push({
+// Небула / частинки — легкий фіолетово-блакитний туман
+const nebulaCanvas = document.getElementById('nebula');
+const nctx = nebulaCanvas.getContext('2d');
+const particles = [];
+for(let i = 0; i < 40; i++){
+  particles.push({
     x: Math.random()*w,
     y: Math.random()*h,
-    r: Math.random()*120 + 60,
+    r: Math.random()*80 + 40,
     a: Math.random()*Math.PI*2,
-    s: Math.random()*0.0003 + 0.00008,
-    type: Math.floor(Math.random()*3)
+    s: Math.random()*0.0004 + 0.0001
   });
 }
 
-function drawGeometry(){
-  gctx.clearRect(0,0,w,h);
-  shapes.forEach(s => {
-    gctx.save();
-    gctx.translate(s.x, s.y);
-    gctx.rotate(s.a);
-    gctx.strokeStyle = `rgba(212,175,55,0.06)`;
-    gctx.lineWidth = 2.5;
-    if(s.type===0) gctx.strokeRect(-s.r/2, -s.r/2, s.r, s.r);
-    if(s.type===1) { gctx.beginPath(); gctx.arc(0,0,s.r/2,0,Math.PI*2); gctx.stroke(); }
-    if(s.type===2) { gctx.beginPath(); gctx.moveTo(-s.r/2,s.r/2); gctx.lineTo(s.r/2,-s.r/2); gctx.stroke(); }
-    gctx.restore();
-    s.a += s.s;
+function drawNebula(){
+  nctx.clearRect(0,0,w,h);
+  particles.forEach(p => {
+    nctx.save();
+    nctx.translate(p.x, p.y);
+    nctx.rotate(p.a);
+    nctx.strokeStyle = `rgba(157,0,255,0.04)`;
+    nctx.lineWidth = 3;
+    nctx.beginPath();
+    nctx.arc(0,0,p.r,0,Math.PI*2);
+    nctx.stroke();
+    nctx.restore();
+    p.a += p.s;
   });
-  requestAnimationFrame(drawGeometry);
+  requestAnimationFrame(drawNebula);
 }
-drawGeometry();
+drawNebula();
 
 window.addEventListener('resize', () => {
-  w = starsCanvas.width = geoCanvas.width = window.innerWidth;
-  h = starsCanvas.height = geoCanvas.height = window.innerHeight;
+  w = starsCanvas.width = nebulaCanvas.width = window.innerWidth;
+  h = starsCanvas.height = nebulaCanvas.height = window.innerHeight;
 });
 
-// Галерея — 26 плаваючих елементів
+// Галерея — 26 елементів, що пливуть
 const gallery = document.getElementById('gallery');
 const baseURL = 'https://raw.githubusercontent.com/ТВОЙ_ЮЗЕР/ТВОЙ_РЕПО/main/';
 const TOTAL = 26;
@@ -282,47 +286,48 @@ for(let i = 1; i <= TOTAL; i++){
   const item = document.createElement('div');
   item.className = 'item';
 
-  // Рандомна позиція + глибина
-  const left = Math.random() * 80 + 10;
-  const top = Math.random() * 140 + 20; // високо, щоб пливли вниз
-  const z = Math.random() * 200 - 100;
-  const rot = Math.random() * 12 - 6;
-  const delay = Math.random() * 20;
+  // Рандомна стартова позиція + глибина
+  const left = Math.random() * 90 + 5;
+  const top = Math.random() * 180 + 10;
+  const z = Math.random() * 300 - 150;
+  const rotX = Math.random() * 10 - 5;
+  const rotY = Math.random() * 10 - 5;
+  const delay = Math.random() * 30;
 
   item.style.left = `${left}%`;
   item.style.top = `${top}%`;
-  item.style.transform = `translateZ(${z}px) rotate(${rot}deg)`;
-  item.style.animation = `drift 120s linear infinite ${delay}s`;
+  item.style.transform = `translateZ(${z}px) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+  item.style.animation = `cosmicDrift 180s linear infinite ${delay}s`;
 
   const media = isPhoto 
-    ? `<img src="${baseURL}${i}.jpg" alt="Artwork ${i}" loading="lazy">`
+    ? `<img src="${baseURL}${i}.jpg" alt="work ${i}" loading="lazy">`
     : `<video src="${baseURL}${i}.mp4" loop muted playsinline loading="lazy"></video>`;
 
   item.innerHTML = `
     ${media}
-    <div class="desc-overlay"><span>№ ${i.toString().padStart(2,'0')}</span></div>
+    <div class="desc-overlay"><span>${i.toString().padStart(2,'0')}</span></div>
   `;
 
   item.onclick = () => {
     modalMedia.innerHTML = isPhoto
-      ? `<img class="modal-media" src="${baseURL}${i}.jpg" alt="Artwork ${i}">`
+      ? `<img class="modal-media" src="${baseURL}${i}.jpg" alt="work ${i}">`
       : `<video class="modal-media" src="${baseURL}${i}.mp4" autoplay loop muted playsinline></video>`;
-    modalDesc.innerHTML = `Робота № ${i.toString().padStart(2,'0')} <strong>·</strong> ${isPhoto ? 'Фотографія' : 'Відео'} · Exclusive 2025–2026<br><small>Кліком поза вікном — закрити</small>`;
+    modalDesc.innerHTML = `work ${i.toString().padStart(2,'0')} <strong>·</strong> ${isPhoto ? 'photo' : 'video'} · drifting in void 2025–2026`;
     modal.classList.add('show');
   };
 
   gallery.appendChild(item);
 }
 
-// Анімація дрейфу (пливуть повільно вниз/вгору + легкий бічний рух)
+// Анімація космічного дрейфу
 const style = document.createElement('style');
 style.textContent = `
-  @keyframes drift {
-    0%   { transform: translate(0, 0) rotate(0deg); }
-    25%  { transform: translate(8%, -15%) rotate(3deg); }
-    50%  { transform: translate(-6%, -30%) rotate(-2deg); }
-    75%  { transform: translate(10%, -45%) rotate(4deg); }
-    100% { transform: translate(0, -60%) rotate(0deg); }
+  @keyframes cosmicDrift {
+    0%   { transform: translate(0, 0) rotateX(0deg) rotateY(0deg); }
+    25%  { transform: translate(12%, -20%) rotateX(6deg) rotateY(-8deg); }
+    50%  { transform: translate(-10%, -40%) rotateX(-4deg) rotateY(10deg); }
+    75%  { transform: translate(15%, -60%) rotateX(8deg) rotateY(-6deg); }
+    100% { transform: translate(0, -80%) rotateX(0deg) rotateY(0deg); }
   }
 `;
 document.head.appendChild(style);
