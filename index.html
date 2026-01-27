@@ -1,194 +1,330 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IBONARIUM · Перша виставка</title>
-<style>
-  * { margin:0; padding:0; box-sizing:border-box; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IBONARIUM · Перша виставка</title>
 
-  html, body {
-    width:100%;
-    height:100%;
-    background:#000;
-    font-family:"Courier New", monospace;
-    overflow-x:hidden;
-  }
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --text: #e0e0e0;
+      --accent: #00ff99;
+      --accent-dim: rgba(0, 255, 153, 0.15);
+      --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+      --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
 
-  canvas {
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    z-index:0;
-  }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-  .gallery {
-    position: relative;
-    z-index:2;
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 40px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 60px;
-    align-items: center;
-  }
+    html, body {
+      width: 100%;
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Courier New', monospace;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
 
-  .item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    animation: float 10s ease-in-out infinite alternate;
-  }
+    /* Фон — дуже стримані зірки + геометрія */
+    canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
 
-  .item img, .item video {
-    width: 90%;
-    max-width: 900px;
-    border-radius: 8px;
-    object-fit: cover;
-    box-shadow: 0 0 30px rgba(0,255,102,0.4);
-  }
+    .gallery-wrapper {
+      position: relative;
+      z-index: 10;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 5rem 1.5rem 6rem;
+    }
 
-  .description {
-    margin-top: 8px;
-    font-size: 14px;
-    color: #00ff66aa;
-    text-align: center;
-    max-width: 90%;
-  }
+    h1 {
+      text-align: center;
+      font-size: clamp(2.2rem, 6vw, 4.5rem);
+      font-weight: normal;
+      letter-spacing: -0.04em;
+      margin-bottom: 1.5rem;
+      color: white;
+      text-shadow: 0 0 40px rgba(0,255,153,0.2);
+    }
 
-  video {
-    display: block;
-  }
+    .subtitle {
+      text-align: center;
+      color: #777;
+      font-size: 1.1rem;
+      margin-bottom: 4rem;
+      letter-spacing: 0.08em;
+    }
 
-  @keyframes float {
-    0% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(-10px) rotate(1deg); }
-    100% { transform: translateY(0px) rotate(0deg); }
-  }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 2.5rem;
+    }
 
-  @media (max-width:600px){
-    .gallery { gap: 40px; padding: 20px 10px; }
-    .description { font-size: 12px; }
-  }
-</style>
+    .item {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: var(--transition);
+      background: rgba(20,20,20,0.6);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(0,255,153,0.08);
+      backdrop-filter: blur(6px);
+      box-shadow: var(--card-shadow);
+    }
+
+    .item.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .item img,
+    .item video {
+      width: 100%;
+      height: auto;
+      display: block;
+      aspect-ratio: 4 / 5;          /* можна змінити на 3/4, 1/1 тощо */
+      object-fit: cover;
+      transition: transform 0.7s ease;
+    }
+
+    .item:hover img,
+    .item:hover video {
+      transform: scale(1.06);
+    }
+
+    .description {
+      padding: 1.4rem 1.6rem;
+      font-size: 0.95rem;
+      color: #aaa;
+      background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
+      text-align: center;
+    }
+
+    .description strong {
+      color: var(--accent);
+    }
+
+    /* Пагінація */
+    .pagination {
+      margin-top: 5rem;
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .page-btn {
+      background: rgba(0,255,153,0.08);
+      color: var(--accent);
+      border: 1px solid rgba(0,255,153,0.2);
+      padding: 0.8rem 1.4rem;
+      border-radius: 50px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: var(--transition);
+      min-width: 44px;
+      text-align: center;
+    }
+
+    .page-btn:hover {
+      background: rgba(0,255,153,0.2);
+      transform: translateY(-2px);
+    }
+
+    .page-btn.active {
+      background: var(--accent);
+      color: #000;
+      border-color: var(--accent);
+      box-shadow: 0 0 25px rgba(0,255,153,0.4);
+    }
+
+    @media (max-width: 700px) {
+      .gallery {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+      .gallery-wrapper {
+        padding: 4rem 1rem 5rem;
+      }
+    }
+  </style>
 </head>
 <body>
 
 <canvas id="stars"></canvas>
 <canvas id="geometry"></canvas>
 
-<div class="gallery" id="gallery"></div>
+<div class="gallery-wrapper">
+  <h1>IBONARIUM</h1>
+  <div class="subtitle">Перша виставка · 2026</div>
+
+  <div class="gallery" id="gallery"></div>
+
+  <div class="pagination" id="pagination"></div>
+</div>
 
 <script>
-  // ==== Зірки на фоні ====
-  const starsCanvas = document.getElementById('stars');
-  const sctx = starsCanvas.getContext('2d');
-  let w = starsCanvas.width = window.innerWidth;
-  let h = starsCanvas.height = window.innerHeight;
+// ==============================================
+// Фон — зірки
+// ==============================================
+const starsCanvas = document.getElementById('stars');
+const sctx = starsCanvas.getContext('2d');
+let w = starsCanvas.width = window.innerWidth;
+let h = starsCanvas.height = window.innerHeight;
 
-  const stars = [];
-  for(let i=0;i<200;i++){
-    stars.push({x:Math.random()*w, y:Math.random()*h, r:Math.random()*1.5, d:Math.random()*0.4 + 0.1});
-  }
-
-  function drawStars(){
-    sctx.clearRect(0,0,w,h);
-    sctx.fillStyle="#fff";
-    sctx.beginPath();
-    stars.forEach(s=>{
-      sctx.moveTo(s.x,s.y);
-      sctx.arc(s.x,s.y,s.r,0,Math.PI*2);
-      s.y += s.d;
-      if(s.y>h) s.y=0;
-    });
-    sctx.fill();
-    requestAnimationFrame(drawStars);
-  }
-  drawStars();
-
-  // ==== Геометрія на фоні ====
-  const geoCanvas = document.getElementById('geometry');
-  const gctx = geoCanvas.getContext('2d');
-  let shapes = [];
-  for(let i=0;i<50;i++){
-    shapes.push({
-      x: Math.random()*w,
-      y: Math.random()*h,
-      r: Math.random()*50+20,
-      a: Math.random()*Math.PI*2,
-      s: Math.random()*0.5+0.2,
-      type: Math.floor(Math.random()*3)
-    });
-  }
-
-  function drawGeometry(){
-    gctx.clearRect(0,0,w,h);
-    shapes.forEach(shape=>{
-      gctx.save();
-      gctx.translate(shape.x, shape.y);
-      gctx.rotate(shape.a);
-      gctx.strokeStyle = `rgba(0,255,102,0.2)`;
-      gctx.lineWidth = 2;
-      if(shape.type===0) gctx.strokeRect(-shape.r/2,-shape.r/2,shape.r,shape.r);
-      if(shape.type===1) gctx.beginPath(); gctx.arc(0,0,shape.r/2,0,Math.PI*2); gctx.stroke();
-      if(shape.type===2) { gctx.beginPath(); gctx.moveTo(-shape.r/2,shape.r/2); gctx.lineTo(shape.r/2,-shape.r/2); gctx.stroke(); }
-      gctx.restore();
-      shape.a += 0.001;
-      shape.y += Math.sin(Date.now()/2000 + shape.x)*0.1;
-    });
-    requestAnimationFrame(drawGeometry);
-  }
-  drawGeometry();
-
-  window.addEventListener('resize', ()=>{
-    w = starsCanvas.width = geoCanvas.width = window.innerWidth;
-    h = starsCanvas.height = geoCanvas.height = window.innerHeight;
+const stars = [];
+for(let i = 0; i < 180; i++){
+  stars.push({
+    x: Math.random()*w,
+    y: Math.random()*h,
+    r: Math.random()*1.1 + 0.3,
+    d: Math.random()*0.3 + 0.08
   });
+}
 
-  // ==== Галерея 26 файлів ====
-  const gallery = document.getElementById('gallery');
-  const baseURL = 'https://raw.githubusercontent.com/ТВОЙ_ЮЗЕР/ТВОЙ_РЕПО/main/'; // твій GitHub
+function drawStars(){
+  sctx.fillStyle = 'rgba(10,10,10,0.4)';
+  sctx.fillRect(0,0,w,h);
+  sctx.fillStyle = "rgba(220,255,240,0.7)";
+  sctx.beginPath();
+  stars.forEach(s => {
+    sctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+    s.y += s.d;
+    if(s.y > h) s.y = -s.r*2;
+  });
+  sctx.fill();
+  requestAnimationFrame(drawStars);
+}
+drawStars();
 
-  const jpegFiles = [];
-  const videoFiles = [];
-  for(let i=1;i<=13;i++){
-    jpegFiles.push(i+'.jpg');
-    videoFiles.push(i+'.mp4');
-  }
+// ==============================================
+// Геометрія — дуже тихо
+// ==============================================
+const geoCanvas = document.getElementById('geometry');
+const gctx = geoCanvas.getContext('2d');
+let shapes = [];
+for(let i = 0; i < 18; i++){
+  shapes.push({
+    x: Math.random()*w,
+    y: Math.random()*h,
+    r: Math.random()*60 + 30,
+    a: Math.random()*Math.PI*2,
+    s: Math.random()*0.0008 + 0.0003,
+    type: Math.floor(Math.random()*3)
+  });
+}
 
-  for(let i=0;i<13;i++){
-    // JPEG
-    const imgItem = document.createElement('div');
-    imgItem.className='item';
-    const img = document.createElement('img');
-    img.src = baseURL + jpegFiles[i];
-    imgItem.appendChild(img);
+function drawGeometry(){
+  gctx.clearRect(0,0,w,h);
+  shapes.forEach(s => {
+    gctx.save();
+    gctx.translate(s.x, s.y);
+    gctx.rotate(s.a);
+    gctx.strokeStyle = `rgba(0,255,153,0.07)`;
+    gctx.lineWidth = 1.5;
+    
+    if(s.type===0) gctx.strokeRect(-s.r/2, -s.r/2, s.r, s.r);
+    if(s.type===1) { gctx.beginPath(); gctx.arc(0,0,s.r/2,0,Math.PI*2); gctx.stroke(); }
+    if(s.type===2) { gctx.beginPath(); gctx.moveTo(-s.r/2,s.r/2); gctx.lineTo(s.r/2,-s.r/2); gctx.stroke(); }
+    
+    gctx.restore();
+    s.a += s.s;
+  });
+  requestAnimationFrame(drawGeometry);
+}
+drawGeometry();
+
+window.addEventListener('resize', () => {
+  w = starsCanvas.width = geoCanvas.width = window.innerWidth;
+  h = starsCanvas.height = geoCanvas.height = window.innerHeight;
+});
+
+// ==============================================
+// Галерея + пагінація
+// ==============================================
+const gallery = document.getElementById('gallery');
+const pagination = document.getElementById('pagination');
+
+const baseURL = 'https://raw.githubusercontent.com/ТВОЙ_ЮЗЕР/ТВОЙ_РЕПО/main/';
+const ITEMS_PER_PAGE = 6;
+const totalItems = 13;
+let currentPage = 1;
+
+function renderPage(page) {
+  gallery.innerHTML = '';
+  const start = (page - 1) * ITEMS_PER_PAGE;
+  const end = Math.min(start + ITEMS_PER_PAGE, totalItems);
+
+  for(let i = start; i < end; i++) {
+    const idx = i + 1;
+
+    const item = document.createElement('div');
+    item.className = 'item';
+
+    // Чергуємо фото / відео
+    if (idx % 2 === 1) {
+      // Фото
+      const img = document.createElement('img');
+      img.src = `${baseURL}${idx}.jpg`;
+      img.alt = `Зображення ${idx}`;
+      item.appendChild(img);
+    } else {
+      // Відео
+      const video = document.createElement('video');
+      video.src = `${baseURL}${idx}.mp4`;
+      video.controls = true;
+      video.loop = true;
+      video.muted = true;
+      video.playsInline = true;
+      item.appendChild(video);
+    }
+
     const desc = document.createElement('div');
-    desc.className='description';
-    desc.textContent=`Опис зображення ${i+1}`;
-    imgItem.appendChild(desc);
-    gallery.appendChild(imgItem);
+    desc.className = 'description';
+    desc.innerHTML = `Робота ${idx} <strong>·</strong> 2025–2026`;
+    item.appendChild(desc);
 
-    // Відео
-    const vidItem = document.createElement('div');
-    vidItem.className='item';
-    const video = document.createElement('video');
-    video.src = baseURL + videoFiles[i];
-    video.controls = true;
-    video.loop = true;
-    video.muted = true;
-    video.autoplay = false;
-    vidItem.appendChild(video);
-    const vdesc = document.createElement('div');
-    vdesc.className='description';
-    vdesc.textContent=`Опис відео ${i+1}`;
-    vidItem.appendChild(vdesc);
-    gallery.appendChild(vidItem);
+    gallery.appendChild(item);
+
+    // Плавна поява
+    setTimeout(() => item.classList.add('show'), 100 + (i - start) * 120);
   }
-</script>
 
+  renderPagination(page);
+}
+
+function renderPagination(current) {
+  pagination.innerHTML = '';
+
+  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+
+  for(let i = 1; i <= totalPages; i++){
+    const btn = document.createElement('button');
+    btn.className = 'page-btn';
+    btn.textContent = i;
+    if(i === current) btn.classList.add('active');
+    btn.addEventListener('click', () => {
+      currentPage = i;
+      renderPage(i);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    pagination.appendChild(btn);
+  }
+}
+
+// Початок
+renderPage(currentPage);
+</script>
 </body>
 </html>
