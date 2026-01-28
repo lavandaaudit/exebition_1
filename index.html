@@ -15,9 +15,10 @@
       height: 100vh;
       font-family: Arial, sans-serif;
       overflow: hidden;
+      color: #777; /* для тексту внизу */
     }
 
-    /* Плаваючі зірки */
+    /* Плаваючі зірки — повільніші */
     .stars {
       position: fixed;
       inset: 0;
@@ -66,6 +67,20 @@
       object-fit: cover;
       object-position: center;
     }
+
+    /* Напис внизу */
+    .footer-text {
+      position: fixed;
+      bottom: 12px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 13px;
+      color: #555;
+      pointer-events: none;
+      z-index: 10;
+      letter-spacing: 1px;
+    }
   </style>
 </head>
 <body>
@@ -88,8 +103,11 @@
     </div>
   </div>
 
+  <!-- Напис внизу -->
+  <div class="footer-text">decoracia1</div>
+
   <script>
-    // Зірки (без змін)
+    // Зірки — повільніші (50–90 секунд)
     const starsContainer = document.getElementById('stars');
     const count = 180;
     for (let i = 0; i < count; i++) {
@@ -100,46 +118,21 @@
       star.style.height = `${size}px`;
       star.style.left = Math.random() * 100 + 'vw';
       star.style.top = Math.random() * -20 + 'vh';
-      const duration = Math.random() * 25 + 35;
+      const duration = Math.random() * 40 + 50; // 50–90 с — повільніше
       star.style.animationDuration = `${duration}s`;
       const drift = (Math.random() - 0.5) * 80 + 'vw';
       star.style.setProperty('--drift-x', drift);
-      star.style.animationDelay = Math.random() * -40 + 's';
+      star.style.animationDelay = Math.random() * -60 + 's';
       starsContainer.appendChild(star);
     }
 
-    // Примусовий запуск відео + логування помилок
+    // Примусовий запуск відео (залишив на всяк випадок)
     window.addEventListener('load', () => {
-      const videos = document.querySelectorAll('video');
-
-      videos.forEach((video, index) => {
-        video.muted = true;           // ще раз примусово (на всяк)
+      document.querySelectorAll('video').forEach(video => {
+        video.muted = true;
         video.playsInline = true;
-
-        // Пробуємо запустити
-        const playPromise = video.play();
-
-        if (playPromise !== undefined) {
-          playPromise
-            .then(() => {
-              console.log(`Відео ${index + 1} успішно запустилось`);
-            })
-            .catch(err => {
-              console.error(`Відео ${index + 1} не запустилось:`, err.message);
-              // Часто на мобілках — "The play() request was interrupted..." або "NotAllowedError"
-            });
-        }
-
-        // Якщо відео зупинилось — пробуємо перезапустити
-        video.addEventListener('pause', () => {
-          if (!video.ended) {
-            video.play().catch(e => console.warn('Перезапуск не вдався:', e));
-          }
-        });
-
-        video.addEventListener('error', (e) => {
-          console.error(`Помилка завантаження відео ${index + 1}:`, e);
-          console.log('Джерело:', video.currentSrc);
+        video.play().catch(err => {
+          console.log('Автозапуск:', err.message);
         });
       });
     });
