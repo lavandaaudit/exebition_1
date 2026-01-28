@@ -35,7 +35,6 @@
       to { transform: translateY(-120vh) translateX(var(--drift-x)); }
     }
 
-    /* Контейнер з екранами — чітко по центру */
     .screens {
       position: fixed;
       inset: 0;
@@ -47,9 +46,9 @@
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(2, 38vw);       /* зменшено з 45vw */
-      grid-template-rows: repeat(2, 38vh);          /* зменшено з 45vh */
-      gap: 1.8vw;                                   /* трохи менший відступ */
+      grid-template-columns: repeat(2, 38vw);
+      grid-template-rows: repeat(2, 38vh);
+      gap: 1.8vw;
       max-width: 90vw;
       max-height: 90vh;
     }
@@ -57,8 +56,8 @@
     .video-box {
       overflow: hidden;
       background: #111;
-      border-radius: 6px;                           /* легке закруглення — опціонально */
-      box-shadow: 0 0 20px rgba(255,255,255,0.08);  /* легке сяйво — опціонально */
+      border-radius: 6px;
+      box-shadow: 0 0 20px rgba(255,255,255,0.08);
     }
 
     video {
@@ -70,29 +69,27 @@
   </style>
 </head>
 <body>
-  <!-- Зірки -->
   <div class="stars" id="stars"></div>
 
-  <!-- Відеоекрани -->
   <div class="screens">
     <div class="grid">
       <div class="video-box">
-        <video autoplay loop muted playsinline src="https://raw.githubusercontent.com/lavandaaudit/exebition_1/main/1.mp4"></video>
+        <video id="v1" autoplay loop muted playsinline src="https://raw.githubusercontent.com/lavandaaudit/exebition_1/main/1.mp4"></video>
       </div>
       <div class="video-box">
-        <video autoplay loop muted playsinline src="https://raw.githubusercontent.com/lavandaaudit/exebition_1/main/2.mp4"></video>
+        <video id="v2" autoplay loop muted playsinline src="https://raw.githubusercontent.com/lavandaaudit/exebition_1/main/2.mp4"></video>
       </div>
       <div class="video-box">
-        <video autoplay loop muted playsinline src="https://raw.githubusercontent.com/lavandaaudit/exebition_1/main/3.mp4"></video>
+        <video id="v3" autoplay loop muted playsinline src="https://raw.githubusercontent.com/lavandaaudit/exebition_1/main/3.mp4"></video>
       </div>
       <div class="video-box">
-        <video autoplay loop muted playsinline src="https://raw.githubusercontent.com/lavandaaudit/exebition_1/main/4.mp4"></video>
+        <video id="v4" autoplay loop muted playsinline src="https://raw.githubusercontent.com/lavandaaudit/exebition_1/main/4.mp4"></video>
       </div>
     </div>
   </div>
 
   <script>
-    // Генерація зірок
+    // Зірки (без змін)
     const starsContainer = document.getElementById('stars');
     const count = 180;
     for (let i = 0; i < count; i++) {
@@ -103,13 +100,49 @@
       star.style.height = `${size}px`;
       star.style.left = Math.random() * 100 + 'vw';
       star.style.top = Math.random() * -20 + 'vh';
-      const duration = Math.random() * 25 + 35; // 35–60 с
+      const duration = Math.random() * 25 + 35;
       star.style.animationDuration = `${duration}s`;
       const drift = (Math.random() - 0.5) * 80 + 'vw';
       star.style.setProperty('--drift-x', drift);
       star.style.animationDelay = Math.random() * -40 + 's';
       starsContainer.appendChild(star);
     }
+
+    // Примусовий запуск відео + логування помилок
+    window.addEventListener('load', () => {
+      const videos = document.querySelectorAll('video');
+
+      videos.forEach((video, index) => {
+        video.muted = true;           // ще раз примусово (на всяк)
+        video.playsInline = true;
+
+        // Пробуємо запустити
+        const playPromise = video.play();
+
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              console.log(`Відео ${index + 1} успішно запустилось`);
+            })
+            .catch(err => {
+              console.error(`Відео ${index + 1} не запустилось:`, err.message);
+              // Часто на мобілках — "The play() request was interrupted..." або "NotAllowedError"
+            });
+        }
+
+        // Якщо відео зупинилось — пробуємо перезапустити
+        video.addEventListener('pause', () => {
+          if (!video.ended) {
+            video.play().catch(e => console.warn('Перезапуск не вдався:', e));
+          }
+        });
+
+        video.addEventListener('error', (e) => {
+          console.error(`Помилка завантаження відео ${index + 1}:`, e);
+          console.log('Джерело:', video.currentSrc);
+        });
+      });
+    });
   </script>
 </body>
 </html>
